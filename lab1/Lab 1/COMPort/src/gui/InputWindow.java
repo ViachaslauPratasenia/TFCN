@@ -1,6 +1,6 @@
 package gui;
 
-import serial.SerialPortController;
+import serial.SerialPortDAO;
 import helper.*;
 import javafx.geometry.Insets;
 
@@ -13,18 +13,16 @@ import javafx.scene.text.Text;
 
 
 public class InputWindow {
-    private static final double PADDING = 5;
-
-    private SerialPortController serialPortController;
+    private SerialPortDAO serialPortDAO;
 
     private VBox inputLayout;
     private TextArea inputArea;
     private Text outputBytes;
 
-    public InputWindow(SerialPortController serialPortController, TextArea inputArea, Text outputBytes) {
+    public InputWindow(SerialPortDAO serialPortDAO, TextArea inputArea, Text outputBytes) {
         this.inputArea = inputArea;
         this.outputBytes = outputBytes;
-        this.serialPortController = serialPortController;
+        this.serialPortDAO = serialPortDAO;
         this.initLayout();
     }
 
@@ -34,13 +32,13 @@ public class InputWindow {
 
     private void initLayout() {
         inputLayout = new VBox();
-        inputLayout.setPadding(new Insets(PADDING));
-        inputLayout.setSpacing(PADDING);
-        inputLayout.setMinSize(CommonWindow.MIN_WIDTH, CommonWindow.MIN_HEIGHT);
+        inputLayout.setPadding(new Insets(Constants.PADDING));
+        inputLayout.setSpacing(Constants.PADDING);
+        inputLayout.setMinSize(Constants.MIN_WIDTH, Constants.MIN_HEIGHT);
         inputLayout.setFillWidth(true);
 
         Label inputLabel = new Label("Input Area");
-        inputLabel.setFont(FontHelper.FONT);
+        inputLabel.setFont(Constants.FONT);
         inputLayout.setAlignment(Pos.CENTER);
         inputLayout.getChildren().add(inputLabel);
 
@@ -48,20 +46,20 @@ public class InputWindow {
         inputLayout.getChildren().add(inputArea);
 
         Button sendButton = new Button("Send");
-        sendButton.setFont(FontHelper.FONT);
-        sendButton.setPrefWidth(CommonWindow.MIN_WIDTH);
+        sendButton.setFont(Constants.FONT);
+        sendButton.setPrefWidth(Constants.MIN_WIDTH);
         sendButton.setOnAction(event -> send());
         inputLayout.getChildren().add(sendButton);
     }
 
     private void send() {
         try {
-            this.serialPortController.write(inputArea.getText().getBytes());
-            outputBytes.setText(Integer.toString(this.serialPortController.getSent()));
+            this.serialPortDAO.write(inputArea.getText().getBytes());
+            outputBytes.setText(Integer.toString(this.serialPortDAO.getSent()));
             inputArea.clear();
         }
         catch (Exception exception) {
-            ExceptionWarningHelper.showException(exception);
+            ExceptionInformationHelper.showException(exception);
         }
     }
 }

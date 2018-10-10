@@ -1,7 +1,7 @@
 package gui;
 
-import serial.SerialPortController;
-import helper.FontHelper;
+import serial.SerialPortDAO;
+import helper.Constants;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -10,14 +10,14 @@ import javafx.scene.layout.VBox;
 
 public class OutputWindow {
     private static final double PADDING = 2;
-    private SerialPortController serialPortController;
+    private SerialPortDAO serialPortDAO;
 
     private VBox outputLayout;
     private TextArea outputArea;
 
-    public OutputWindow(SerialPortController serialPortController, TextArea outputArea) {
+    public OutputWindow(SerialPortDAO serialPortDAO, TextArea outputArea) {
         this.outputArea = outputArea;
-        this.serialPortController = serialPortController;
+        this.serialPortDAO = serialPortDAO;
         this.initLayout();
     }
 
@@ -29,11 +29,11 @@ public class OutputWindow {
         outputLayout = new VBox();
         outputLayout.setPadding(new Insets(PADDING));
         outputLayout.setSpacing(PADDING);
-        outputLayout.setMinSize(CommonWindow.MIN_WIDTH, CommonWindow.MIN_HEIGHT);
+        outputLayout.setMinSize(Constants.MIN_WIDTH, Constants.MIN_HEIGHT);
         outputLayout.setFillWidth(true);
 
         Label outputLabel = new Label("Output Area");
-        outputLabel.setFont(FontHelper.FONT);
+        outputLabel.setFont(Constants.FONT);
         outputLayout.setAlignment(Pos.CENTER);
         outputLayout.getChildren().add(outputLabel);
         outputLayout.getChildren().add(outputArea);

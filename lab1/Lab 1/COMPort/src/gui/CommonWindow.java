@@ -1,6 +1,7 @@
 package gui;
 
-import serial.SerialPortController;
+import helper.Constants;
+import serial.SerialPortDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
@@ -9,12 +10,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import static helper.Constants.*;
+
 public class CommonWindow {
-    public static final double MIN_WIDTH = 420;
-    public static final double MIN_HEIGHT = 240;
-    public static final String XON_IS_ON = "Sending data is allowed";
-    public static final String XOFF_IS_ON = "Sending data is restricted";
-    public static final String NOT_SUPPORTED = "XON/XOFF flow control is not supported";
 
     private Scene scene;
 
@@ -24,7 +22,7 @@ public class CommonWindow {
     private Text receivedTF;
     private Text sentTF;
 
-    public CommonWindow(SerialPortController serialPortController) {
+    public CommonWindow(SerialPortDAO serialPortDAO) {
         inputArea = new TextArea();
         outputArea = new TextArea();
         receivedTF = new Text();
@@ -39,13 +37,13 @@ public class CommonWindow {
         secondSeparator.setPrefWidth(MIN_WIDTH);
         secondSeparator.setValignment(VPos.CENTER);
 
-        InputWindow inputWindow = new InputWindow(serialPortController, inputArea, sentTF);
-        OutputWindow outputWindow = new OutputWindow(serialPortController, outputArea);
-        DebugWindow debugWindow = new DebugWindow(serialPortController, xonXoffTF, receivedTF, sentTF);
+        InputWindow inputWindow = new InputWindow(serialPortDAO, inputArea, sentTF);
+        OutputWindow outputWindow = new OutputWindow(serialPortDAO, outputArea);
+        DebugWindow debugWindow = new DebugWindow(serialPortDAO, xonXoffTF, receivedTF, sentTF);
 
         VBox mainLayout = new VBox();
-        mainLayout.setPadding(new Insets(5));
-        mainLayout.setSpacing(5);
+        mainLayout.setPadding(new Insets(Constants.PADDING));
+        mainLayout.setSpacing(Constants.PADDING);
 
         mainLayout.getChildren().add(inputWindow.getLayout());
         mainLayout.getChildren().add(firstSeparator);
