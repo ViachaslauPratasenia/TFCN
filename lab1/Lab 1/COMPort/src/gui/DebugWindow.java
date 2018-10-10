@@ -71,7 +71,7 @@ public class DebugWindow {
         ObservableList<String> items = FXCollections.observableArrayList (
                 SerialPortDAO.getPortNames());
         portList = new ComboBox<>(items);
-        portList.setPromptText("Ports");
+        portList.setPromptText("Available ports");
         portList.valueProperty().addListener((observableValue, previous, current) -> portName = current);
         portList.setPrefSize(400,20);
         portBox.getChildren().add(portList);
@@ -168,19 +168,19 @@ public class DebugWindow {
 
     private void close() {
         try {
-            this.serialPortDAO.closeSerialPort();
+            this.serialPortDAO.closePort();
             this.portIsOpened = !this.portIsOpened;
 
             receivedTF.setText("0");
             sentTF.setText("0");
-            xonXoffTF.setText("");
+            xonXoffTF.setText(null);
 
-            openPortButton.setDisable(this.portIsOpened);
-            closePortButton.setDisable(!this.portIsOpened);
             sendXoffButton.setDisable(!this.portIsOpened);
             sendXonButton.setDisable(!this.portIsOpened);
             portList.setDisable(this.portIsOpened);
             xonXoffCheckBox.setDisable(this.portIsOpened);
+            openPortButton.setDisable(this.portIsOpened);
+            closePortButton.setDisable(!this.portIsOpened);
         }
         catch (Exception exception) {
             ExceptionInformationHelper.showException(exception);

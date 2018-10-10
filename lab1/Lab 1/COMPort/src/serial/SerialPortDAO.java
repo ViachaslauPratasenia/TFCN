@@ -36,7 +36,7 @@ public class SerialPortDAO implements SerialPortInterface{
     }
 
     @Override
-    public boolean closeSerialPort() throws SerialPortException{
+    public boolean closePort() throws SerialPortException{
         boolean result = this.serialPort.closePort();
         this.serialPort = null;
         sent = 0;
