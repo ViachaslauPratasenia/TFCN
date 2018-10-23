@@ -4,7 +4,7 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 
 public interface SerialPortInterface {
-    void setSerialPort(SerialPort serialPort, boolean XonXoffFlowControlEnable) throws SerialPortException;
+    void setSerialPort(SerialPort serialPort, boolean xonXoffFlowControlEnable) throws SerialPortException;
     boolean closePort() throws SerialPortException;
     boolean sendXon() throws SerialPortException;
     boolean sendXoff() throws SerialPortException;

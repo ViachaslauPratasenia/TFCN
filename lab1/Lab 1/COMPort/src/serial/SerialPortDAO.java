@@ -1,5 +1,6 @@
 package serial;
 
+import helper.Constants;
 import jssc.SerialPort;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
@@ -9,30 +10,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SerialPortDAO implements SerialPortInterface{
-    public static final byte XON_CHAR = 17;
-    public static final byte XOFF_CHAR = 19;
-
     private SerialPort serialPort = null;
     private SerialPortEventListener serialPortEventListener;
     private boolean xonXoffFlowControlEnable = false;
-    private boolean XoffIsSet = true;
+    private boolean xoffIsSet = true;
     private int received;
     private int sent;
 
+    public SerialPortDAO(SerialPortEventListener serialPortEventListener) {
+        this.serialPortEventListener = serialPortEventListener;
+    }
+
     @Override
-    public void setSerialPort(SerialPort serialPort, boolean XonXoffFlowControlEnable) throws SerialPortException {
+    public void setSerialPort(SerialPort serialPort, boolean xonXoffFlowControlEnable) throws SerialPortException {
         this.serialPort = serialPort;
-        this.xonXoffFlowControlEnable = XonXoffFlowControlEnable;
+        this.xonXoffFlowControlEnable = xonXoffFlowControlEnable;
         serialPort.openPort();
         serialPort.setParams(SerialPort.BAUDRATE_9600,
                 SerialPort.DATABITS_8,
                 SerialPort.STOPBITS_1,
                 SerialPort.PARITY_NONE);
         serialPort.addEventListener(this.serialPortEventListener);
-    }
-
-    public SerialPortDAO(SerialPortEventListener serialPortEventListener) {
-        this.serialPortEventListener = serialPortEventListener;
     }
 
     @Override
@@ -46,19 +44,19 @@ public class SerialPortDAO implements SerialPortInterface{
 
     @Override
     public boolean sendXon() throws SerialPortException{
-        return this.serialPort.writeByte(SerialPortDAO.XON_CHAR);
+        return this.serialPort.writeByte(Constants.XON_CHAR);
     }
 
     @Override
     public boolean sendXoff() throws SerialPortException {
-        return this.serialPort.writeByte(SerialPortDAO.XOFF_CHAR);
+        return this.serialPort.writeByte(Constants.XOFF_CHAR);
     }
 
     @Override
     public byte[] read(int byteCount) throws SerialPortException {
         byte[] result = this.serialPort.readBytes(byteCount);
         if(this.xonXoffFlowControlEnable) {
-            if (result[0] != XON_CHAR && result[0] != XOFF_CHAR) {
+            if (result[0] != Constants.XON_CHAR && result[0] != Constants.XOFF_CHAR) {
                 received += result.length;
             }
         } else
@@ -69,7 +67,7 @@ public class SerialPortDAO implements SerialPortInterface{
     @Override
     public boolean write(byte[] source) throws SerialPortException  {
         boolean result = false;
-        if(!(this.xonXoffFlowControlEnable && this.XoffIsSet)) {
+        if(!(this.xonXoffFlowControlEnable && this.xoffIsSet)) {
             result = this.serialPort.writeBytes(source);
             if (result) this.sent += source.length;
         }
@@ -85,7 +83,7 @@ public class SerialPortDAO implements SerialPortInterface{
     }
 
     public void setXoffState(boolean value) {
-        this.XoffIsSet = value;
+        this.xoffIsSet = value;
     }
 
     public boolean getXonXoffFlowControlMode() {

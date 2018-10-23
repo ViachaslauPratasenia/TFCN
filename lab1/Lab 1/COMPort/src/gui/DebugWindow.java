@@ -22,7 +22,7 @@ public class DebugWindow {
     private Text receivedTF;
     private Text sentTF;
 
-    private ComboBox<String> portList;
+    public static ComboBox<String> portList;
     private CheckBox xonXoffCheckBox;
 
     private Button openPortButton;
@@ -48,6 +48,7 @@ public class DebugWindow {
     }
 
     private void initLayout() {
+
         debugLayout = new VBox();
         debugLayout.setPadding(new Insets(Constants.PADDING));
         debugLayout.setSpacing(Constants.PADDING);
@@ -71,18 +72,17 @@ public class DebugWindow {
         ObservableList<String> items = FXCollections.observableArrayList (
                 SerialPortDAO.getPortNames());
         portList = new ComboBox<>(items);
-        portList.setPromptText("Available ports");
+        portList.setPromptText("COM ports");
         portList.valueProperty().addListener((observableValue, previous, current) -> portName = current);
         portList.setPrefSize(400,20);
         portBox.getChildren().add(portList);
 
-        Label flowControlLabel = new Label("Enable XON/XOFF control ");
+        Label flowControlLabel = new Label("XON/XOFF control ");
         debugGP.add(flowControlLabel, 0, 0);
         xonXoffCheckBox = new CheckBox();
         xonXoffCheckBox.setSelected(false);
         xonXoffCheckBox.selectedProperty().
-                addListener((observableValue, previous, current) ->
-                       flowControlEnabled = current);
+                addListener((observableValue, previous, current) -> flowControlEnabled = current);
         debugGP.add(xonXoffCheckBox, 1, 0);
 
         openPortButton = new Button("Open");
@@ -96,15 +96,16 @@ public class DebugWindow {
         closePortButton.setDisable(this.portIsOpened);
         portBox.getChildren().add(closePortButton);
 
-        sendXoffButton = new Button("Send XOFF");
-        sendXoffButton.setPrefWidth((Constants.MIN_WIDTH - Constants.PADDING) / 2);
-        sendXoffButton.setOnAction(event -> sendXoff());
-        debugGP.add(sendXoffButton, 0, 2);
-
         sendXonButton = new Button("Send XON");
         sendXonButton.setPrefWidth((Constants.MIN_WIDTH - Constants.PADDING) / 2);
         sendXonButton.setOnAction(event -> sendXon());
-        debugGP.add(sendXonButton, 1, 2);
+        debugGP.add(sendXonButton, 0, 2);
+
+
+        sendXoffButton = new Button("Send XOFF");
+        sendXoffButton.setPrefWidth((Constants.MIN_WIDTH - Constants.PADDING) / 2);
+        sendXoffButton.setOnAction(event -> sendXoff());
+        debugGP.add(sendXoffButton, 1, 2);
 
         Label bytesReceivedLabel = new Label("Received: ");
         debugGP.add(bytesReceivedLabel, 0, 3);
@@ -125,7 +126,7 @@ public class DebugWindow {
         try {
             this.serialPortDAO.sendXoff();
         } catch(Exception exception) {
-            ExceptionInformationHelper.showException(exception);
+            ExceptionInformationHelper.showMessage("Port is not opened");
         }
     }
 
@@ -133,7 +134,7 @@ public class DebugWindow {
         try {
             this.serialPortDAO.sendXon();
         } catch(Exception exception) {
-            ExceptionInformationHelper.showException(exception);
+            ExceptionInformationHelper.showMessage("Port is not opened");
         }
     }
 
@@ -142,18 +143,18 @@ public class DebugWindow {
             SerialPort serialPort = new SerialPort(portName);
             this.serialPortDAO.setSerialPort(serialPort, flowControlEnabled);
             this.portIsOpened = !this.portIsOpened;
-            openPortButton.setDisable(this.portIsOpened);
-            closePortButton.setDisable(!this.portIsOpened);
             sendXonButton.setDisable(!this.flowControlEnabled);
             sendXoffButton.setDisable(!this.flowControlEnabled);
             portList.setDisable(this.portIsOpened);
             xonXoffCheckBox.setDisable(this.portIsOpened);
+            openPortButton.setDisable(this.portIsOpened);
+            closePortButton.setDisable(!this.portIsOpened);
 
             if(this.flowControlEnabled) {
                 xonXoffTF.setText(Constants.XOFF_IS_ON);
                 xonXoffTF.setFont(Constants.FONT);
                 xonXoffTF.setUnderline(true);
-                xonXoffTF.setFill(Color.RED);
+                xonXoffTF.setFill(Color.DARKRED);
             } else {
                 xonXoffTF.setText(Constants.NOT_SUPPORTED);
                 xonXoffTF.setFont(Constants.FONT);

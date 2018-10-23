@@ -1,5 +1,6 @@
 package gui;
 
+import javafx.scene.control.Alert;
 import serial.SerialPortDAO;
 import helper.*;
 import javafx.geometry.Insets;
@@ -54,12 +55,13 @@ public class InputWindow {
 
     private void send() {
         try {
+            if(DebugWindow.portList == null) throw new NullPointerException("Port is not open");
             this.serialPortDAO.write(inputArea.getText().getBytes());
             outputBytes.setText(Integer.toString(this.serialPortDAO.getSent()));
             inputArea.clear();
         }
         catch (Exception exception) {
-            ExceptionInformationHelper.showException(exception);
+            ExceptionInformationHelper.showMessage("Port is not opened");
         }
     }
 }

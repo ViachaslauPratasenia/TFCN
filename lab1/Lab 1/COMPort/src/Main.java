@@ -10,18 +10,11 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import helper.ExceptionInformationHelper;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-
 public class Main extends Application  {
     private SerialPortDAO serialPortDAO;
     private SerialPortEventListener serialPortEventListener;
 
     private CommonWindow commonWindow;
-
-    private Calendar calendar = Calendar.getInstance();
-    private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
     private class SerialPortListener implements SerialPortEventListener {
         public void serialEvent(SerialPortEvent event) {
@@ -30,16 +23,16 @@ public class Main extends Application  {
                     byte[] readBytes;
                     if(serialPortDAO.getXonXoffFlowControlMode()) {
                         readBytes = serialPortDAO.read(event.getEventValue());
-                        boolean containsXonXoff = (readBytes[0] == SerialPortDAO.XON_CHAR
-                                || readBytes[0] == SerialPortDAO.XOFF_CHAR);
+                        boolean containsXonXoff = (readBytes[0] == Constants.XON_CHAR
+                                || readBytes[0] == Constants.XOFF_CHAR);
                         if(containsXonXoff) {
-                            serialPortDAO.setXoffState(readBytes[0] == SerialPortDAO.XOFF_CHAR);
-                            if(readBytes[0] == SerialPortDAO.XOFF_CHAR) {
+                            serialPortDAO.setXoffState(readBytes[0] == Constants.XOFF_CHAR);
+                            if(readBytes[0] == Constants.XOFF_CHAR) {
                                 ThreadHelper.runOnThread(() -> {
                                     commonWindow.getXonXoffTF().setText(Constants.XOFF_IS_ON);
                                     commonWindow.getXonXoffTF().setFont(Constants.FONT);
                                     commonWindow.getXonXoffTF().setUnderline(true);
-                                    commonWindow.getXonXoffTF().setFill(Color.RED);
+                                    commonWindow.getXonXoffTF().setFill(Color.DARKRED);
                                 });
                             } else {
                                 ThreadHelper.runOnThread(() -> {
@@ -52,8 +45,7 @@ public class Main extends Application  {
                         }
                         if(!containsXonXoff && event.getEventValue() > 0) {
                             serialPortDAO.sendXoff();
-                            String result = "User(" + sdf.format(calendar.getTime()) + ") : " +
-                                    new String(readBytes) + "\n";
+                            String result = new String(readBytes) + "\n";
                             ThreadHelper.runOnThread(() -> {
                                 commonWindow.getOutputArea().appendText(result);
                                 commonWindow.getBytesReceivedField().
@@ -70,8 +62,7 @@ public class Main extends Application  {
                         });
                         readBytes = serialPortDAO.read(event.getEventValue());
                         if (readBytes != null) {
-                            String result = "User(" + sdf.format(calendar.getTime()) + ") : " +
-                                    new String(readBytes) + "\n";
+                            String result = new String(readBytes) + "\n";
                             ThreadHelper.runOnThread(() -> {
                                 commonWindow.getOutputArea().appendText(result);
                                 commonWindow.getBytesReceivedField().

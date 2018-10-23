@@ -34,6 +34,7 @@ public class OutputWindow {
 
         Label outputLabel = new Label("Output Area");
         outputLabel.setFont(Constants.FONT);
+        outputArea.setEditable(false);
         outputLayout.setAlignment(Pos.CENTER);
         outputLayout.getChildren().add(outputLabel);
         outputLayout.getChildren().add(outputArea);
