@@ -48,7 +48,7 @@ public class CommonWindow {
         thirdSeparator.setPrefWidth(MIN_WIDTH);
         thirdSeparator.setValignment(VPos.CENTER);
 
-        InputWindow inputWindow = new InputWindow(serialPortDAO, inputArea, sentTF);
+        InputWindow inputWindow = new InputWindow(serialPortDAO, inputArea, sentTF, packageArea, destinationAddressTF);
         OutputWindow outputWindow = new OutputWindow(serialPortDAO, outputArea);
         DebugWindow debugWindow = new DebugWindow(serialPortDAO, xonXoffTF, receivedTF, sentTF, sourceAddressTF,
                 destinationAddressTF);

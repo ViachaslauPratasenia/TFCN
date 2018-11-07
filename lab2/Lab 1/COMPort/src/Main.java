@@ -1,5 +1,5 @@
 import gui.CommonWindow;
-import helper.Constants;
+import static helper.Constants.*;
 import helper.ThreadHelper;
 import javafx.application.Application;
 import javafx.scene.paint.Color;
@@ -20,58 +20,62 @@ public class Main extends Application  {
         public void serialEvent(SerialPortEvent event) {
             if (event.isRXCHAR() && event.getEventValue() > 0) {
                 try {
-                    byte[] readBytes;
-                    if(serialPortDAO.getXonXoffFlowControlMode()) {
-                        readBytes = serialPortDAO.read(event.getEventValue());
-                        boolean containsXonXoff = (readBytes[0] == Constants.XON_CHAR
-                                || readBytes[0] == Constants.XOFF_CHAR);
-                        if(containsXonXoff) {
-                            serialPortDAO.setXoffState(readBytes[0] == Constants.XOFF_CHAR);
-                            if(readBytes[0] == Constants.XOFF_CHAR) {
+                    byte[] readBytes = serialPortDAO.read(event.getEventValue());
+
+                    // if the received package was not damaged during transmission
+                    // and was meant for this station
+                    if(serialPortDAO.getPackageState() == PackageState.GOOD) {
+                        if(serialPortDAO.getXonXoffFlowControlMode()) {
+
+                            boolean containsXonXoff = (readBytes[0] == XOFF_CHAR ||
+                                    readBytes[0] == XON_CHAR);
+                            if(containsXonXoff) {
+                                boolean value = readBytes[0] == XOFF_CHAR;
+                                serialPortDAO.setXoffState(value);
+
+                                if(value) {
+                                    ThreadHelper.runOnThread(() -> {
+                                        commonWindow.getXonXoffTF().setText(XOFF_IS_ON);
+                                        commonWindow.getXonXoffTF().setFill(Color.RED);
+                                    });
+                                } else {
+                                    ThreadHelper.runOnThread(() -> {
+                                        commonWindow.getXonXoffTF().setText(XON_IS_ON);
+                                        commonWindow.getXonXoffTF().setFill(Color.valueOf("#00c800"));
+                                    });
+                                }
+                            }
+
+                            if(!containsXonXoff && event.getEventValue() > 0) {
+                                serialPortDAO.sendXoff(serialPortDAO.getSenderAddress());
+
+                                String result = new String(readBytes);
                                 ThreadHelper.runOnThread(() -> {
-                                    commonWindow.getXonXoffTF().setText(Constants.XOFF_IS_ON);
-                                    commonWindow.getXonXoffTF().setFont(Constants.FONT);
-                                    commonWindow.getXonXoffTF().setUnderline(true);
-                                    commonWindow.getXonXoffTF().setFill(Color.DARKRED);
+                                    commonWindow.getOutputArea().appendText(result);
+                                    commonWindow.getBytesReceivedField().setText(Integer.
+                                            toString(serialPortDAO.getReceived()));
                                 });
-                            } else {
+
+                                serialPortDAO.sendXon(serialPortDAO.getSenderAddress());
+                            }
+                        } else {
+                            ThreadHelper.runOnThread(() -> {
+                                commonWindow.getXonXoffTF().setText(NOT_SUPPORTED);
+                                commonWindow.getXonXoffTF().setFill(Color.GREY);
+                            });
+
+                            if (readBytes != null) {
+                                String result = new String(readBytes);
                                 ThreadHelper.runOnThread(() -> {
-                                    commonWindow.getXonXoffTF().setText(Constants.XON_IS_ON);
-                                    commonWindow.getXonXoffTF().setFont(Constants.FONT);
-                                    commonWindow.getXonXoffTF().setUnderline(true);
-                                    commonWindow.getXonXoffTF().setFill(Color.GREEN);
+                                    commonWindow.getOutputArea().appendText(result);
+                                    commonWindow.getBytesReceivedField().setText(Integer.
+                                            toString(serialPortDAO.getReceived()));
                                 });
                             }
                         }
-                        if(!containsXonXoff && event.getEventValue() > 0) {
-                            serialPortDAO.sendXoff();
-                            String result = new String(readBytes) + "\n";
-                            ThreadHelper.runOnThread(() -> {
-                                commonWindow.getOutputArea().appendText(result);
-                                commonWindow.getBytesReceivedField().
-                                        setText(Integer.toString(serialPortDAO.getReceived()));
-                            });
-                            serialPortDAO.sendXon();
-                        }
-                    } else {
-                        ThreadHelper.runOnThread(() -> {
-                            commonWindow.getXonXoffTF().setText(Constants.NOT_SUPPORTED);
-                            commonWindow.getXonXoffTF().setFont(Constants.FONT);
-                            commonWindow.getXonXoffTF().setUnderline(true);
-                            commonWindow.getXonXoffTF().setFill(Color.GREY);
-                        });
-                        readBytes = serialPortDAO.read(event.getEventValue());
-                        if (readBytes != null) {
-                            String result = new String(readBytes) + "\n";
-                            ThreadHelper.runOnThread(() -> {
-                                commonWindow.getOutputArea().appendText(result);
-                                commonWindow.getBytesReceivedField().
-                                        setText(Integer.toString(serialPortDAO.getReceived()));
-                            });
-                        }
                     }
                 } catch (Exception exception) {
-                    ExceptionInformationHelper.showException(exception);
+                    ThreadHelper.runOnThread(() -> ExceptionInformationHelper.showException(exception));
                 }
             }
         }

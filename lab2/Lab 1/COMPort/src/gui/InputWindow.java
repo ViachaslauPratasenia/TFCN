@@ -1,16 +1,16 @@
 package gui;
 
-import javafx.scene.control.Alert;
+import convert.Converter;
+import javafx.scene.control.*;
 import serial.SerialPortDAO;
 import helper.*;
 import javafx.geometry.Insets;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+
+import java.util.ArrayList;
 
 
 public class InputWindow {
@@ -19,11 +19,16 @@ public class InputWindow {
     private VBox inputLayout;
     private TextArea inputArea;
     private Text outputBytes;
+    private TextArea packageArea;
+    private TextField destination;
 
-    public InputWindow(SerialPortDAO serialPortDAO, TextArea inputArea, Text outputBytes) {
+    public InputWindow(SerialPortDAO serialPortDAO, TextArea inputArea, Text outputBytes, TextArea packageArea,
+                       TextField destination) {
         this.inputArea = inputArea;
         this.outputBytes = outputBytes;
         this.serialPortDAO = serialPortDAO;
+        this.packageArea = packageArea;
+        this.destination = destination;
         this.initLayout();
     }
 
@@ -55,9 +60,25 @@ public class InputWindow {
 
     private void send() {
         try {
-            if(DebugWindow.portList == null) throw new NullPointerException("Port is not open");
-            this.serialPortDAO.write(inputArea.getText().getBytes());
+            if(this.serialPortDAO.getXoffState() && this.serialPortDAO.getXonXoffFlowControlMode()) {
+                return;
+            }
+
+            ArrayList<byte[]> messages = serialPortDAO.composePackages(
+                    inputArea.getText().getBytes(), (byte)Integer.parseInt(destination.getText())
+            );
+
+            this.packageArea.clear();
+
+            for(byte[] message : messages) {
+                this.packageArea.appendText(Converter.bytesToHex(message));
+                this.packageArea.appendText("\n\n");
+            }
+
+            this.serialPortDAO.write(messages);
+
             outputBytes.setText(Integer.toString(this.serialPortDAO.getSent()));
+
             inputArea.clear();
         }
         catch (Exception exception) {

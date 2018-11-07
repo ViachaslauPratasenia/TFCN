@@ -139,7 +139,7 @@ public class DebugWindow {
 
     private void sendXoff() {
         try {
-            this.serialPortDAO.sendXoff();
+            this.serialPortDAO.sendXoff(destination);
         } catch(Exception exception) {
             ExceptionInformationHelper.showMessage("Port is not opened");
         }
@@ -147,7 +147,7 @@ public class DebugWindow {
 
     private void sendXon() {
         try {
-            this.serialPortDAO.sendXon();
+            this.serialPortDAO.sendXon(destination);
         } catch(Exception exception) {
             ExceptionInformationHelper.showMessage("Port is not opened");
         }
@@ -155,12 +155,12 @@ public class DebugWindow {
 
     private void open() {
         try {
-            try {
-                address = Byte.parseByte(sourceAddressTF.getText());
-                destination = Byte.parseByte(destinationAddressTF.getText());
-            } catch (NumberFormatException e) {
+            address = (byte)Integer.parseInt(sourceAddressTF.getText());
+            destination = (byte)Integer.parseInt(destinationAddressTF.getText());
+            if(Integer.parseInt(sourceAddressTF.getText()) > 255 || Integer.parseInt(destinationAddressTF.getText()) > 255){
                 throw new IllegalArgumentException("Source/destination address must be less than 255");
             }
+
             if(address == -1 || destination == -1) {
                 throw new IllegalArgumentException("You must set source/destination address.");
             }
@@ -168,7 +168,7 @@ public class DebugWindow {
                 throw new IllegalArgumentException("Source and destination address can't be equal!");
             }
             SerialPort serialPort = new SerialPort(portName);
-            this.serialPortDAO.setSerialPort(serialPort, flowControlEnabled);
+            this.serialPortDAO.setSerialPort(serialPort, address, flowControlEnabled);
             this.portIsOpened = !this.portIsOpened;
             sendXonButton.setDisable(!this.flowControlEnabled);
             sendXoffButton.setDisable(!this.flowControlEnabled);
@@ -176,6 +176,7 @@ public class DebugWindow {
             xonXoffCheckBox.setDisable(this.portIsOpened);
             openPortButton.setDisable(this.portIsOpened);
             closePortButton.setDisable(!this.portIsOpened);
+            sourceAddressTF.setEditable(false);
 
             if(this.flowControlEnabled) {
                 xonXoffTF.setText(Constants.XOFF_IS_ON);
