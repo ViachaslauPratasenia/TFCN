@@ -185,7 +185,7 @@ public class SerialPortDAO implements SerialPortInterface{
 
     @Override
     public boolean sendXon(byte destination) throws SerialPortException{
-        if(destination <= 0) {
+        if(destination < 0) {
             throw new IllegalArgumentException("The value of param destination is invalid!");
         }
         byte[] xon = { XON_CHAR };
@@ -195,7 +195,7 @@ public class SerialPortDAO implements SerialPortInterface{
 
     @Override
     public boolean sendXoff(byte destination) throws SerialPortException {
-        if(destination <= 0) {
+        if(destination < 0) {
             throw new IllegalArgumentException("The value of param destination is invalid!");
         }
 

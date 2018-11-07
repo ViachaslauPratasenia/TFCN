@@ -176,7 +176,7 @@ public class DebugWindow {
             xonXoffCheckBox.setDisable(this.portIsOpened);
             openPortButton.setDisable(this.portIsOpened);
             closePortButton.setDisable(!this.portIsOpened);
-            sourceAddressTF.setEditable(false);
+            sourceAddressTF.setDisable(true);
 
             if(this.flowControlEnabled) {
                 xonXoffTF.setText(Constants.XOFF_IS_ON);
@@ -210,6 +210,7 @@ public class DebugWindow {
             xonXoffCheckBox.setDisable(this.portIsOpened);
             openPortButton.setDisable(this.portIsOpened);
             closePortButton.setDisable(!this.portIsOpened);
+            sourceAddressTF.setDisable(false);
         }
         catch (Exception exception) {
             ExceptionInformationHelper.showException(exception);
