@@ -41,7 +41,7 @@ public class Main extends Application  {
                                 } else {
                                     ThreadHelper.runOnThread(() -> {
                                         commonWindow.getXonXoffTF().setText(XON_IS_ON);
-                                        commonWindow.getXonXoffTF().setFill(Color.valueOf("#00c800"));
+                                        commonWindow.getXonXoffTF().setFill(Color.DARKRED);
                                     });
                                 }
                             }

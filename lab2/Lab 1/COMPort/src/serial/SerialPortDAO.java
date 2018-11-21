@@ -36,6 +36,7 @@ public class SerialPortDAO implements SerialPortInterface{
         byte code = 1;
 
         while(readIndex < source.length) {
+            //code - сколько байт до следующей буквы А
             if(source[readIndex] == PACKAGE_BEGINNING_FLAG) {
                 result[codeIndex] = code;
                 code = 1;
@@ -109,7 +110,7 @@ public class SerialPortDAO implements SerialPortInterface{
         return result;
     }
 
-    public byte[] decomposePackage(byte[] source) {
+    private byte[] decomposePackage(byte[] source) {
         if(serialPort == null) {
             throw new NullPointerException("The value of param serialPort can not bu null!");
         }
@@ -145,9 +146,9 @@ public class SerialPortDAO implements SerialPortInterface{
         }
 
         ArrayList<byte[]> result = new ArrayList<>();
-
+        //на какое количество пакетов нужно разбить
         int amountOfPackages = (int)Math.ceil((double)source.length / (double)PACKAGE_DATA_LENGTH);
-
+        //количество нераспределенных байтов источника
         int undistributedDataSize = source.length;
         int sourceIndex = 0;
 
@@ -242,7 +243,7 @@ public class SerialPortDAO implements SerialPortInterface{
         }
 
         this.senderAddress = decomposedSource[PACKAGE_SOURCE_OFFSET];
-
+        //оставляет только данные
         byte[] data = this.retrievePackageData(decomposedSource);
 
         if(this.xonXoffFlowControlEnable) {
