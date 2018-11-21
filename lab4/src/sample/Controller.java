@@ -98,15 +98,11 @@ public class Controller {
         this.dataBuffer = data;
     }
 
-    private boolean generateBoolean() {
+    private boolean isChannelBusy() {
         return (System.currentTimeMillis() % 2) == 1;
     }
 
-    private boolean isChannelBusy() {
-        return generateBoolean();
-    }
-
     private boolean isCollision() {
-        return generateBoolean();
+        return (System.currentTimeMillis() % 2) == 1;
     }
 }
