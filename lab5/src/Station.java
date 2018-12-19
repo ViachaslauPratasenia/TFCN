@@ -118,7 +118,7 @@ public class Station{
             btnSend.setDisable(true);
             btnSend.setMinHeight(30);
             btnSend.setPrefWidth(300);
-            debugLayout.getChildren().add(btnSend);
+            //debugLayout.getChildren().add(btnSend);
 
             Label labelDestAddress = new Label("Destination");
             debugLayout.getChildren().add(labelDestAddress);
@@ -137,14 +137,6 @@ public class Station{
             RadioButton button2 = new RadioButton(initDestinations[2]);
             button2.setPadding(new Insets(2,25,2,2));
             button2.setToggleGroup(destinationsList);
-
-            /*destinationsList.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-                @Override
-                public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                    RadioButton button = (RadioButton)destinationsList.getSelectedToggle();
-                    currentDestination = button.getText();
-                }
-            });*/
 
             destinationsList.selectedToggleProperty().addListener(listener -> {
                 RadioButton button = (RadioButton)destinationsList.getSelectedToggle();
@@ -173,10 +165,10 @@ public class Station{
             separatorTwo.setValignment(VPos.CENTER);
             debugLayout.getChildren().add(separatorTwo);
 
+            debugLayout.getChildren().add(txtSource);
+
             Label labelDebug = new Label("Debug: ");
             debugLayout.getChildren().add(labelDebug);
-
-            debugLayout.getChildren().add(txtSource);
 
             taToken = new TextArea();
             taToken.setEditable(false);

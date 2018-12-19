@@ -74,7 +74,6 @@ public class Main extends Application {
     public static void stationRoutine(Station station, Package tokenPackage){
         try {
             if (tokenPackage.getControl() == 0) {
-                Helper.runOnUIThread(() -> station.getTaToken().setText(MARKER));
                 tokenPackage.setSource(station.getSourceAddr());
                 tokenPackage.setDestination(station.getDestinationAddr());
                 tokenPackage.setMonitor(station.getMonitor());
@@ -87,13 +86,14 @@ public class Main extends Application {
                         tokenPackage.setStatus((byte) 1);
                         station.getTaOutput().appendText(data);
                     }
-                    if (tokenPackage.getStatus() == 1) {
+                    if (tokenPackage.getStatus() == 1 && station.getMonitor() == 1) {
                         tokenPackage.setControl((byte) 0);
                         tokenPackage.freeData();
                         tokenPackage.setStatus((byte) 0);
                     }
                 });
             }
+            Helper.runOnUIThread(() -> station.getTaToken().setText(MARKER));
             Thread.sleep(DELAY);
             Helper.runOnUIThread(() -> station.getTaToken().setText(""));
 
@@ -105,7 +105,6 @@ public class Main extends Application {
     public void sendPacket(Station station) {
         if (!station.getTaInput().getText().equals("")
                 && !station.getCurrentDestination().equals("")
-                && station.requestStatus()
                 && _package.getControl() == 0
                 && _package != null) {
             if (station.getTaToken().getText().equals("*")) {
